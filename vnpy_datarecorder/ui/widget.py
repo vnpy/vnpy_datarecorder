@@ -11,7 +11,8 @@ from ..engine import (
     APP_NAME,
     EVENT_RECORDER_LOG,
     EVENT_RECORDER_UPDATE,
-    EVENT_RECORDER_EXCEPTION
+    EVENT_RECORDER_EXCEPTION,
+    RecorderEngine
 )
 
 
@@ -28,7 +29,7 @@ class RecorderManager(QtWidgets.QWidget):
 
         self.main_engine: MainEngine = main_engine
         self.event_engine: EventEngine = event_engine
-        self.recorder_engine: DataRecorderEngine = main_engine.get_engine(APP_NAME)
+        self.recorder_engine: RecorderEngine = main_engine.get_engine(APP_NAME)
 
         self.init_ui()
         self.register_event()
