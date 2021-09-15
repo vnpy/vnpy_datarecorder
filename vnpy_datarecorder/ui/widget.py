@@ -1,9 +1,11 @@
 from datetime import datetime
+from typing import Any, List
 
 from vnpy.event import Event, EventEngine
-from vnpy.trader.engine import MainEngine
+from vnpy.trader.engine import BaseEngine, MainEngine
 from vnpy.trader.ui import QtCore, QtWidgets
 from vnpy.trader.event import EVENT_CONTRACT
+from vnpy.trader.object import ContractData
 
 from ..engine import (
     APP_NAME,
@@ -21,18 +23,18 @@ class RecorderManager(QtWidgets.QWidget):
     signal_contract = QtCore.pyqtSignal(Event)
     signal_exception = QtCore.pyqtSignal(Event)
 
-    def __init__(self, main_engine: MainEngine, event_engine: EventEngine):
+    def __init__(self, main_engine: MainEngine, event_engine: EventEngine) -> None:
         super().__init__()
 
-        self.main_engine = main_engine
-        self.event_engine = event_engine
-        self.recorder_engine = main_engine.get_engine(APP_NAME)
+        self.main_engine: MainEngine = main_engine
+        self.event_engine: EventEngine = event_engine
+        self.recorder_engine: BaseEngine = main_engine.get_engine(APP_NAME)
 
         self.init_ui()
         self.register_event()
         self.recorder_engine.put_event()
 
-    def init_ui(self):
+    def init_ui(self) -> None:
         """"""
         self.setWindowTitle("行情记录")
         self.resize(1000, 600)
@@ -47,7 +49,7 @@ class RecorderManager(QtWidgets.QWidget):
         self.interval_spin.setSuffix("秒")
         self.interval_spin.valueChanged.connect(self.set_interval)
 
-        contracts = self.main_engine.get_all_contracts()
+        contracts: List[ContractData] = self.main_engine.get_all_contracts()
         self.vt_symbols = [contract.vt_symbol for contract in contracts]
 
         self.symbol_completer = QtWidgets.QCompleter(self.vt_symbols)
@@ -108,7 +110,7 @@ class RecorderManager(QtWidgets.QWidget):
         vbox.addLayout(grid2)
         self.setLayout(vbox)
 
-    def register_event(self):
+    def register_event(self) -> None:
         """"""
         self.signal_log.connect(self.process_log_event)
         self.signal_contract.connect(self.process_contract_event)
@@ -122,57 +124,57 @@ class RecorderManager(QtWidgets.QWidget):
             EVENT_RECORDER_UPDATE, self.signal_update.emit)
         self.event_engine.register(EVENT_RECORDER_EXCEPTION, self.signal_exception.emit)
 
-    def process_log_event(self, event: Event):
+    def process_log_event(self, event: Event) -> None:
         """"""
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        msg = f"{timestamp}\t{event.data}"
+        timestamp: str = datetime.now().strftime("%H:%M:%S")
+        msg: str = f"{timestamp}\t{event.data}"
         self.log_edit.append(msg)
 
-    def process_update_event(self, event: Event):
+    def process_update_event(self, event: Event) -> None:
         """"""
-        data = event.data
+        data: Any = event.data
 
         self.bar_recording_edit.clear()
-        bar_text = "\n".join(data["bar"])
+        bar_text: str = "\n".join(data["bar"])
         self.bar_recording_edit.setText(bar_text)
 
         self.tick_recording_edit.clear()
-        tick_text = "\n".join(data["tick"])
+        tick_text: str = "\n".join(data["tick"])
         self.tick_recording_edit.setText(tick_text)
 
-    def process_contract_event(self, event: Event):
+    def process_contract_event(self, event: Event) -> None:
         """"""
-        contract = event.data
+        contract: ContractData = event.data
         self.vt_symbols.append(contract.vt_symbol)
 
         model = self.symbol_completer.model()
         model.setStringList(self.vt_symbols)
 
-    def process_exception_event(self, event: Event):
+    def process_exception_event(self, event: Event) -> None:
         """"""
         exc_info = event.data
         raise exc_info[1].with_traceback(exc_info[2])
 
-    def add_bar_recording(self):
+    def add_bar_recording(self) -> None:
         """"""
-        vt_symbol = self.symbol_line.text()
+        vt_symbol: str = self.symbol_line.text()
         self.recorder_engine.add_bar_recording(vt_symbol)
 
-    def add_tick_recording(self):
+    def add_tick_recording(self) -> None:
         """"""
-        vt_symbol = self.symbol_line.text()
+        vt_symbol: str = self.symbol_line.text()
         self.recorder_engine.add_tick_recording(vt_symbol)
 
-    def remove_bar_recording(self):
+    def remove_bar_recording(self) -> None:
         """"""
-        vt_symbol = self.symbol_line.text()
+        vt_symbol: str = self.symbol_line.text()
         self.recorder_engine.remove_bar_recording(vt_symbol)
 
-    def remove_tick_recording(self):
+    def remove_tick_recording(self) -> None:
         """"""
-        vt_symbol = self.symbol_line.text()
+        vt_symbol: str = self.symbol_line.text()
         self.recorder_engine.remove_tick_recording(vt_symbol)
 
-    def set_interval(self, interval):
+    def set_interval(self, interval) -> None:
         """"""
         self.recorder_engine.interval = interval
