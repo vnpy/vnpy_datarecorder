@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, List
 
 from vnpy.event import Event, EventEngine
-from vnpy.trader.engine import BaseEngine, MainEngine
+from vnpy.trader.engine import MainEngine
 from vnpy.trader.ui import QtCore, QtWidgets
 from vnpy.trader.event import EVENT_CONTRACT
 from vnpy.trader.object import ContractData
@@ -28,7 +28,7 @@ class RecorderManager(QtWidgets.QWidget):
 
         self.main_engine: MainEngine = main_engine
         self.event_engine: EventEngine = event_engine
-        self.recorder_engine: BaseEngine = main_engine.get_engine(APP_NAME)
+        self.recorder_engine: DataRecorderEngine = main_engine.get_engine(APP_NAME)
 
         self.init_ui()
         self.register_event()
