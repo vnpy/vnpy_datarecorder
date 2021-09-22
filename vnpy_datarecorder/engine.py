@@ -17,14 +17,14 @@ from vnpy.trader.object import (
 from vnpy.trader.event import EVENT_TICK, EVENT_CONTRACT, EVENT_TIMER
 from vnpy.trader.utility import load_json, save_json, BarGenerator
 from vnpy.trader.database import BaseDatabase, get_database
-from vnpy.app.spread_trading.base import EVENT_SPREAD_DATA, SpreadData
+from vnpy_spreadtrading.base import EVENT_SPREAD_DATA, SpreadData
 
 
 APP_NAME: str = "DataRecorder"
 
-EVENT_RECORDER_LOG: str  = "eRecorderLog"
-EVENT_RECORDER_UPDATE: str  = "eRecorderUpdate"
-EVENT_RECORDER_EXCEPTION: str  = "eRecorderException"
+EVENT_RECORDER_LOG: str = "eRecorderLog"
+EVENT_RECORDER_UPDATE: str = "eRecorderUpdate"
+EVENT_RECORDER_EXCEPTION: str = "eRecorderException"
 
 
 class RecorderEngine(BaseEngine):
@@ -32,7 +32,7 @@ class RecorderEngine(BaseEngine):
     For running data recorder.
     """
 
-    setting_filename: str  = "data_recorder_setting.json"
+    setting_filename: str = "data_recorder_setting.json"
 
     def __init__(self, main_engine: MainEngine, event_engine: EventEngine) -> None:
         """"""
