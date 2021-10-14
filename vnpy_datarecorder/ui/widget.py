@@ -178,4 +178,4 @@ class RecorderManager(QtWidgets.QWidget):
 
     def set_interval(self, interval) -> None:
         """"""
-        self.recorder_engine.interval = interval
+        self.recorder_engine.timer_interval = interval
