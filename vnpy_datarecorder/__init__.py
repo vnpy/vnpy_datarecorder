@@ -44,4 +44,4 @@ class DataRecorderApp(BaseApp):
     display_name: str = "行情记录"
     engine_class: RecorderEngine = RecorderEngine
     widget_name: str = "RecorderManager"
-    icon_name: str = "recorder.ico"
+    icon_name: str = str(app_path.joinpath("ui", "recorder.ico"))
