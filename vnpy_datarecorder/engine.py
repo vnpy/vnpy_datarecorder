@@ -52,12 +52,15 @@ class RecorderEngine(BaseEngine):
         self.ticks: Dict[str, List[TickData]] = defaultdict(list)
         self.bars: Dict[str, List[BarData]] = defaultdict(list)
 
-        self.database: BaseDatabase = get_database()
+        self.database: BaseDatabase = self.get_database()
 
         self.load_setting()
         self.register_event()
         self.start()
         self.put_event()
+
+    def get_database(self) -> BaseDatabase:
+        return get_database()
 
     def load_setting(self) -> None:
         """"""
