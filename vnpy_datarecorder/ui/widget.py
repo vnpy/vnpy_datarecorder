@@ -19,10 +19,10 @@ from ..engine import (
 class RecorderManager(QtWidgets.QWidget):
     """"""
 
-    signal_log = QtCore.pyqtSignal(Event)
-    signal_update = QtCore.pyqtSignal(Event)
-    signal_contract = QtCore.pyqtSignal(Event)
-    signal_exception = QtCore.pyqtSignal(Event)
+    signal_log: QtCore.pyqtSignal = QtCore.pyqtSignal(Event)
+    signal_update: QtCore.pyqtSignal = QtCore.pyqtSignal(Event)
+    signal_contract: QtCore.pyqtSignal = QtCore.pyqtSignal(Event)
+    signal_exception: QtCore.pyqtSignal = QtCore.pyqtSignal(Event)
 
     def __init__(self, main_engine: MainEngine, event_engine: EventEngine) -> None:
         super().__init__()
@@ -41,9 +41,9 @@ class RecorderManager(QtWidgets.QWidget):
         self.resize(1000, 600)
 
         # Create widgets
-        self.symbol_line = QtWidgets.QLineEdit()
+        self.symbol_line: QtWidgets.QLineEdit = QtWidgets.QLineEdit()
 
-        self.interval_spin = QtWidgets.QSpinBox()
+        self.interval_spin: QtWidgets.QSpinBox = QtWidgets.QSpinBox()
         self.interval_spin.setMinimum(1)
         self.interval_spin.setMaximum(60)
         self.interval_spin.setValue(self.recorder_engine.timer_interval)
@@ -51,37 +51,37 @@ class RecorderManager(QtWidgets.QWidget):
         self.interval_spin.valueChanged.connect(self.set_interval)
 
         contracts: List[ContractData] = self.main_engine.get_all_contracts()
-        self.vt_symbols = [contract.vt_symbol for contract in contracts]
+        self.vt_symbols: list = [contract.vt_symbol for contract in contracts]
 
-        self.symbol_completer = QtWidgets.QCompleter(self.vt_symbols)
+        self.symbol_completer: QtWidgets.QCompleter = QtWidgets.QCompleter(self.vt_symbols)
         self.symbol_completer.setFilterMode(QtCore.Qt.MatchContains)
         self.symbol_completer.setCompletionMode(
             self.symbol_completer.PopupCompletion)
         self.symbol_line.setCompleter(self.symbol_completer)
 
-        add_bar_button = QtWidgets.QPushButton("添加")
+        add_bar_button: QtWidgets.QPushButton = QtWidgets.QPushButton("添加")
         add_bar_button.clicked.connect(self.add_bar_recording)
 
-        remove_bar_button = QtWidgets.QPushButton("移除")
+        remove_bar_button: QtWidgets.QPushButton = QtWidgets.QPushButton("移除")
         remove_bar_button.clicked.connect(self.remove_bar_recording)
 
-        add_tick_button = QtWidgets.QPushButton("添加")
+        add_tick_button: QtWidgets.QPushButton = QtWidgets.QPushButton("添加")
         add_tick_button.clicked.connect(self.add_tick_recording)
 
-        remove_tick_button = QtWidgets.QPushButton("移除")
+        remove_tick_button: QtWidgets.QPushButton = QtWidgets.QPushButton("移除")
         remove_tick_button.clicked.connect(self.remove_tick_recording)
 
-        self.bar_recording_edit = QtWidgets.QTextEdit()
+        self.bar_recording_edit: QtWidgets.QTextEdit = QtWidgets.QTextEdit()
         self.bar_recording_edit.setReadOnly(True)
 
-        self.tick_recording_edit = QtWidgets.QTextEdit()
+        self.tick_recording_edit: QtWidgets.QTextEdit = QtWidgets.QTextEdit()
         self.tick_recording_edit.setReadOnly(True)
 
-        self.log_edit = QtWidgets.QTextEdit()
+        self.log_edit: QtWidgets.QTextEdit = QtWidgets.QTextEdit()
         self.log_edit.setReadOnly(True)
 
         # Set layout
-        grid = QtWidgets.QGridLayout()
+        grid: QtWidgets.QGridLayout = QtWidgets.QGridLayout()
         grid.addWidget(QtWidgets.QLabel("K线记录"), 0, 0)
         grid.addWidget(add_bar_button, 0, 1)
         grid.addWidget(remove_bar_button, 0, 2)
@@ -89,24 +89,24 @@ class RecorderManager(QtWidgets.QWidget):
         grid.addWidget(add_tick_button, 1, 1)
         grid.addWidget(remove_tick_button, 1, 2)
 
-        form = QtWidgets.QFormLayout()
+        form: QtWidgets.QFormLayout = QtWidgets.QFormLayout()
         form.addRow("本地代码", self.symbol_line)
         form.addRow("写入间隔", self.interval_spin)
 
-        hbox = QtWidgets.QHBoxLayout()
+        hbox: QtWidgets.QHBoxLayout = QtWidgets.QHBoxLayout()
         hbox.addLayout(form)
         hbox.addWidget(QtWidgets.QLabel("     "))
         hbox.addLayout(grid)
         hbox.addStretch()
 
-        grid2 = QtWidgets.QGridLayout()
+        grid2: QtWidgets.QGridLayout = QtWidgets.QGridLayout()
         grid2.addWidget(QtWidgets.QLabel("K线记录列表"), 0, 0)
         grid2.addWidget(QtWidgets.QLabel("Tick记录列表"), 0, 1)
         grid2.addWidget(self.bar_recording_edit, 1, 0)
         grid2.addWidget(self.tick_recording_edit, 1, 1)
         grid2.addWidget(self.log_edit, 2, 0, 1, 2)
 
-        vbox = QtWidgets.QVBoxLayout()
+        vbox: QtWidgets.QVBoxLayout = QtWidgets.QVBoxLayout()
         vbox.addLayout(hbox)
         vbox.addLayout(grid2)
         self.setLayout(vbox)
@@ -148,7 +148,7 @@ class RecorderManager(QtWidgets.QWidget):
         contract: ContractData = event.data
         self.vt_symbols.append(contract.vt_symbol)
 
-        model = self.symbol_completer.model()
+        model: QtCore.QAbstractItemModel = self.symbol_completer.model()
         model.setStringList(self.vt_symbols)
 
     def process_exception_event(self, event: Event) -> None:
