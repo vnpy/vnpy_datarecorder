@@ -19,10 +19,10 @@ from ..engine import (
 class RecorderManager(QtWidgets.QWidget):
     """"""
 
-    signal_log = QtCore.pyqtSignal(Event)
-    signal_update = QtCore.pyqtSignal(Event)
-    signal_contract = QtCore.pyqtSignal(Event)
-    signal_exception = QtCore.pyqtSignal(Event)
+    signal_log: QtCore.pyqtSignal = QtCore.pyqtSignal(Event)
+    signal_update: QtCore.pyqtSignal = QtCore.pyqtSignal(Event)
+    signal_contract: QtCore.pyqtSignal = QtCore.pyqtSignal(Event)
+    signal_exception: QtCore.pyqtSignal = QtCore.pyqtSignal(Event)
 
     def __init__(self, main_engine: MainEngine, event_engine: EventEngine) -> None:
         super().__init__()
@@ -148,7 +148,7 @@ class RecorderManager(QtWidgets.QWidget):
         contract: ContractData = event.data
         self.vt_symbols.append(contract.vt_symbol)
 
-        model = self.symbol_completer.model()
+        model: QtCore.QAbstractItemModel = self.symbol_completer.model()
         model.setStringList(self.vt_symbols)
 
     def process_exception_event(self, event: Event) -> None:
