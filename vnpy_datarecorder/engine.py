@@ -3,7 +3,7 @@ from threading import Thread
 from queue import Queue, Empty
 from copy import copy
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from vnpy.event import Event, EventEngine
 from vnpy.trader.engine import BaseEngine, MainEngine
@@ -20,11 +20,11 @@ from vnpy.trader.database import BaseDatabase, get_database
 from vnpy_spreadtrading.base import EVENT_SPREAD_DATA, SpreadData
 
 
-APP_NAME: str = "DataRecorder"
+APP_NAME = "DataRecorder"
 
-EVENT_RECORDER_LOG: str = "eRecorderLog"
-EVENT_RECORDER_UPDATE: str = "eRecorderUpdate"
-EVENT_RECORDER_EXCEPTION: str = "eRecorderException"
+EVENT_RECORDER_LOG = "eRecorderLog"
+EVENT_RECORDER_UPDATE = "eRecorderUpdate"
+EVENT_RECORDER_EXCEPTION = "eRecorderException"
 
 
 class RecorderEngine(BaseEngine):
@@ -114,7 +114,7 @@ class RecorderEngine(BaseEngine):
             return
 
         if Exchange.LOCAL.value not in vt_symbol:
-            contract: ContractData = self.main_engine.get_contract(vt_symbol)
+            contract: Optional[ContractData] = self.main_engine.get_contract(vt_symbol)
             if not contract:
                 self.write_log(f"找不到合约：{vt_symbol}")
                 return
@@ -142,7 +142,7 @@ class RecorderEngine(BaseEngine):
 
         # For normal contract
         if Exchange.LOCAL.value not in vt_symbol:
-            contract: ContractData = self.main_engine.get_contract(vt_symbol)
+            contract: Optional[ContractData] = self.main_engine.get_contract(vt_symbol)
             if not contract:
                 self.write_log(f"找不到合约：{vt_symbol}")
                 return
@@ -277,10 +277,10 @@ class RecorderEngine(BaseEngine):
 
     def get_bar_generator(self, vt_symbol: str) -> BarGenerator:
         """"""
-        bg: BarGenerator = self.bar_generators.get(vt_symbol, None)
+        bg: Optional[BarGenerator] = self.bar_generators.get(vt_symbol, None)
 
         if not bg:
-            bg: BarGenerator = BarGenerator(self.record_bar)
+            bg = BarGenerator(self.record_bar)
             self.bar_generators[vt_symbol] = bg
 
         return bg
