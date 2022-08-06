@@ -81,9 +81,9 @@ class RecorderEngine(BaseEngine):
                 task_type, data = task
 
                 if task_type == "tick":
-                    self.database.save_tick_data(data)
+                    self.database.save_tick_data(data, stream=True)
                 elif task_type == "bar":
-                    self.database.save_bar_data(data)
+                    self.database.save_bar_data(data, stream=True)
 
             except Empty:
                 continue
