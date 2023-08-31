@@ -17,7 +17,7 @@ from vnpy.trader.object import (
 from vnpy.trader.event import EVENT_TICK, EVENT_CONTRACT, EVENT_TIMER
 from vnpy.trader.utility import load_json, save_json, BarGenerator
 from vnpy.trader.database import BaseDatabase, get_database
-from vnpy_spreadtrading.base import EVENT_SPREAD_DATA, SpreadData
+from vnpy_spreadtrading.base import EVENT_SPREAD_DATA, SpreadItem
 
 
 APP_NAME = "DataRecorder"
@@ -233,8 +233,19 @@ class RecorderEngine(BaseEngine):
 
     def process_spread_event(self, event: Event) -> None:
         """"""
-        spread: SpreadData = event.data
-        tick: TickData = spread.to_tick()
+        spread_item: SpreadItem = event.data
+        tick: TickData = TickData(
+            symbol=spread_item.name,
+            exchange=Exchange.LOCAL,
+            datetime=spread_item.datetime,
+            name=spread_item.name,
+            last_price=(spread_item.bid_price + spread_item.ask_price) / 2,
+            bid_price_1=spread_item.bid_price,
+            ask_price_1=spread_item.ask_price,
+            bid_volume_1=spread_item.bid_volume,
+            ask_volume_1=spread_item.ask_volume,
+            gateway_name="SPREAD"
+        )
 
         # Filter not inited spread data
         if tick.datetime:
