@@ -5,9 +5,9 @@
 </p>
 
 <p align="center">
-    <img src ="https://img.shields.io/badge/version-1.0.4-blueviolet.svg"/>
+    <img src ="https://img.shields.io/badge/version-1.0.5-blueviolet.svg"/>
     <img src ="https://img.shields.io/badge/platform-windows|linux|macos-yellow.svg"/>
-    <img src ="https://img.shields.io/badge/python-3.7|3.8|3.9|3.10-blue.svg" />
+    <img src ="https://img.shields.io/badge/python-3.8|3.9|3.10-blue.svg" />
     <img src ="https://img.shields.io/github/license/vnpy/vnpy.svg?color=orange"/>
 </p>
 
@@ -19,7 +19,7 @@ DataRecorder是用于实时行情记录的模块，用户可以利用该模块�
 
 ## 安装
 
-安装环境推荐基于3.0.0版本以上的【[**VeighNa Studio**](https://www.vnpy.com)】。
+安装环境推荐基于3.7.0版本以上的【[**VeighNa Studio**](https://www.vnpy.com)】。
 
 直接使用pip命令：
 
