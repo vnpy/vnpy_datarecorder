@@ -4,6 +4,7 @@ from queue import Queue, Empty
 from copy import copy
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
+from datetime import datetime, timedelta
 
 from vnpy.event import Event, EventEngine
 from vnpy.trader.engine import BaseEngine, MainEngine
@@ -16,7 +17,7 @@ from vnpy.trader.object import (
 )
 from vnpy.trader.event import EVENT_TICK, EVENT_CONTRACT, EVENT_TIMER
 from vnpy.trader.utility import load_json, save_json, BarGenerator
-from vnpy.trader.database import BaseDatabase, get_database
+from vnpy.trader.database import BaseDatabase, get_database, DB_TZ
 from vnpy_spreadtrading.base import EVENT_SPREAD_DATA, SpreadItem
 
 
@@ -52,6 +53,10 @@ class RecorderEngine(BaseEngine):
         self.ticks: Dict[str, List[TickData]] = defaultdict(list)
         self.bars: Dict[str, List[BarData]] = defaultdict(list)
 
+        self.filter_dt: datetime = datetime.now(DB_TZ)      # Tick数据过滤的时间戳
+        self.filter_window: int = 60                        # Tick数据过滤的时间窗口，默认60秒
+        self.filter_delta: timedelta = None                 # Tick数据过滤的时间偏差对象
+
         self.database: BaseDatabase = get_database()
 
         self.load_setting()
@@ -64,6 +69,9 @@ class RecorderEngine(BaseEngine):
         setting: dict = load_json(self.setting_filename)
         self.tick_recordings = setting.get("tick", {})
         self.bar_recordings = setting.get("bar", {})
+
+        self.filter_window = setting.get("filter_window", 60)
+        self.filter_delta = timedelta(seconds=self.filter_window)
 
     def save_setting(self) -> None:
         """"""
@@ -196,6 +204,11 @@ class RecorderEngine(BaseEngine):
 
     def update_tick(self, tick: TickData) -> None:
         """"""
+        # 过滤偏离本地时间戳过大的Tick数据
+        tick_delta: timedelta = abs(tick.datetime - self.filter_dt)
+        if abs(tick_delta) >= self.filter_delta:
+            return
+
         if tick.vt_symbol in self.tick_recordings:
             self.record_tick(copy(tick))
 
@@ -205,6 +218,8 @@ class RecorderEngine(BaseEngine):
 
     def process_timer_event(self, event: Event) -> None:
         """"""
+        self.filter_dt = datetime.now(DB_TZ)
+
         self.timer_count += 1
         if self.timer_count < self.timer_interval:
             return
