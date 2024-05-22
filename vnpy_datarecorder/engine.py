@@ -1,4 +1,4 @@
-import sys
+import traceback
 from threading import Thread
 from queue import Queue, Empty
 from copy import copy
@@ -99,7 +99,7 @@ class RecorderEngine(BaseEngine):
             except Exception:
                 self.active = False
 
-                info = sys.exc_info()
+                info = traceback.format_exc()
                 event: Event = Event(EVENT_RECORDER_EXCEPTION, info)
                 self.event_engine.put(event)
 
@@ -259,6 +259,7 @@ class RecorderEngine(BaseEngine):
             ask_price_1=spread_item.ask_price,
             bid_volume_1=spread_item.bid_volume,
             ask_volume_1=spread_item.ask_volume,
+            localtime=spread_item.datetime,
             gateway_name="SPREAD"
         )
 
