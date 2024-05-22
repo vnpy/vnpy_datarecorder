@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any, List
 
 from vnpy.event import Event, EventEngine
 from vnpy.trader.engine import MainEngine
@@ -50,7 +49,7 @@ class RecorderManager(QtWidgets.QWidget):
         self.interval_spin.setSuffix("秒")
         self.interval_spin.valueChanged.connect(self.set_interval)
 
-        contracts: List[ContractData] = self.main_engine.get_all_contracts()
+        contracts: list[ContractData] = self.main_engine.get_all_contracts()
         self.vt_symbols: list = [contract.vt_symbol for contract in contracts]
 
         self.symbol_completer: QtWidgets.QCompleter = QtWidgets.QCompleter(self.vt_symbols)
@@ -133,7 +132,7 @@ class RecorderManager(QtWidgets.QWidget):
 
     def process_update_event(self, event: Event) -> None:
         """"""
-        data: Any = event.data
+        data: object = event.data
 
         self.bar_recording_edit.clear()
         bar_text: str = "\n".join(data["bar"])

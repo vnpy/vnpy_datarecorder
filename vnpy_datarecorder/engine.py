@@ -3,7 +3,7 @@ from threading import Thread
 from queue import Queue, Empty
 from copy import copy
 from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from typing import Optional
 from datetime import datetime, timedelta
 
 from vnpy.event import Event, EventEngine
@@ -43,15 +43,15 @@ class RecorderEngine(BaseEngine):
         self.thread: Thread = Thread(target=self.run)
         self.active: bool = False
 
-        self.tick_recordings: Dict[str, Dict] = {}
-        self.bar_recordings: Dict[str, Dict] = {}
-        self.bar_generators: Dict[str, BarGenerator] = {}
+        self.tick_recordings: dict[str, dict] = {}
+        self.bar_recordings: dict[str, dict] = {}
+        self.bar_generators: dict[str, BarGenerator] = {}
 
         self.timer_count: int = 0
         self.timer_interval: int = 10
 
-        self.ticks: Dict[str, List[TickData]] = defaultdict(list)
-        self.bars: Dict[str, List[BarData]] = defaultdict(list)
+        self.ticks: dict[str, list[TickData]] = defaultdict(list)
+        self.bars: dict[str, list[BarData]] = defaultdict(list)
 
         self.filter_dt: datetime = datetime.now(DB_TZ)      # Tick数据过滤的时间戳
         self.filter_window: int = 60                        # Tick数据过滤的时间窗口，默认60秒
@@ -85,7 +85,7 @@ class RecorderEngine(BaseEngine):
         """"""
         while self.active:
             try:
-                task: Any = self.queue.get(timeout=1)
+                task: object = self.queue.get(timeout=1)
                 task_type, data = task
 
                 if task_type == "tick":
@@ -277,10 +277,10 @@ class RecorderEngine(BaseEngine):
 
     def put_event(self) -> None:
         """"""
-        tick_symbols: List[str] = list(self.tick_recordings.keys())
+        tick_symbols: list[str] = list(self.tick_recordings.keys())
         tick_symbols.sort()
 
-        bar_symbols: List[str] = list(self.bar_recordings.keys())
+        bar_symbols: list[str] = list(self.bar_recordings.keys())
         bar_symbols.sort()
 
         data: dict = {
