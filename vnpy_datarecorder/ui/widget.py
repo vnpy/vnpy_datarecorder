@@ -54,8 +54,7 @@ class RecorderManager(QtWidgets.QWidget):
 
         self.symbol_completer: QtWidgets.QCompleter = QtWidgets.QCompleter(self.vt_symbols)
         self.symbol_completer.setFilterMode(QtCore.Qt.MatchContains)
-        self.symbol_completer.setCompletionMode(
-            self.symbol_completer.PopupCompletion)
+        self.symbol_completer.setCompletionMode(self.symbol_completer.CompletionMode.PopupCompletion)
         self.symbol_line.setCompleter(self.symbol_completer)
 
         add_bar_button: QtWidgets.QPushButton = QtWidgets.QPushButton("添加")
