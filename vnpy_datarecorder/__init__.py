@@ -23,16 +23,19 @@
 
 from pathlib import Path
 
-import importlib_metadata
 from vnpy.trader.app import BaseApp
 
 from .engine import RecorderEngine, APP_NAME
 
 
-try:
-    __version__ = importlib_metadata.version("vnpy_datarecorder")
-except importlib_metadata.PackageNotFoundError:
-    __version__ = "dev"
+__all__ = [
+    "RecorderEngine",
+    "APP_NAME",
+    "DataRecorderApp",
+]
+
+
+__version__ = "1.1.0"
 
 
 class DataRecorderApp(BaseApp):
@@ -42,6 +45,6 @@ class DataRecorderApp(BaseApp):
     app_module: str = __module__
     app_path: Path = Path(__file__).parent
     display_name: str = "行情记录"
-    engine_class: RecorderEngine = RecorderEngine
+    engine_class: type[RecorderEngine] = RecorderEngine
     widget_name: str = "RecorderManager"
     icon_name: str = str(app_path.joinpath("ui", "recorder.ico"))
