@@ -3,7 +3,6 @@ from threading import Thread
 from queue import Queue, Empty
 from copy import copy
 from collections import defaultdict
-from typing import Optional
 from datetime import datetime, timedelta
 
 from vnpy.event import Event, EventEngine
@@ -122,7 +121,7 @@ class RecorderEngine(BaseEngine):
             return
 
         if Exchange.LOCAL.value not in vt_symbol:
-            contract: Optional[ContractData] = self.main_engine.get_contract(vt_symbol)
+            contract: ContractData | None = self.main_engine.get_contract(vt_symbol)
             if not contract:
                 self.write_log(f"找不到合约：{vt_symbol}")
                 return
@@ -150,7 +149,7 @@ class RecorderEngine(BaseEngine):
 
         # For normal contract
         if Exchange.LOCAL.value not in vt_symbol:
-            contract: Optional[ContractData] = self.main_engine.get_contract(vt_symbol)
+            contract: ContractData | None = self.main_engine.get_contract(vt_symbol)
             if not contract:
                 self.write_log(f"找不到合约：{vt_symbol}")
                 return
@@ -304,7 +303,7 @@ class RecorderEngine(BaseEngine):
 
     def get_bar_generator(self, vt_symbol: str) -> BarGenerator:
         """"""
-        bg: Optional[BarGenerator] = self.bar_generators.get(vt_symbol, None)
+        bg: BarGenerator | None = self.bar_generators.get(vt_symbol, None)
 
         if not bg:
             bg = BarGenerator(self.record_bar)
