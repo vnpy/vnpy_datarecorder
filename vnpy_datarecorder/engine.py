@@ -54,7 +54,7 @@ class RecorderEngine(BaseEngine):
 
         self.filter_dt: datetime = datetime.now(DB_TZ)      # Tick数据过滤的时间戳
         self.filter_window: int = 60                        # Tick数据过滤的时间窗口，默认60秒
-        self.filter_delta: timedelta = None                 # Tick数据过滤的时间偏差对象
+        self.filter_delta: timedelta                        # Tick数据过滤的时间偏差对象
 
         self.database: BaseDatabase = get_database()
 
@@ -84,7 +84,7 @@ class RecorderEngine(BaseEngine):
         """"""
         while self.active:
             try:
-                task: object = self.queue.get(timeout=1)
+                task: tuple[str, list] = self.queue.get(timeout=1)
                 task_type, data = task
 
                 if task_type == "tick":
