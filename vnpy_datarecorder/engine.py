@@ -3,7 +3,6 @@ from threading import Thread
 from queue import Queue, Empty
 from copy import copy
 from collections import defaultdict
-from typing import Optional
 from datetime import datetime, timedelta
 
 from vnpy.event import Event, EventEngine
@@ -55,7 +54,7 @@ class RecorderEngine(BaseEngine):
 
         self.filter_dt: datetime = datetime.now(DB_TZ)      # Tick数据过滤的时间戳
         self.filter_window: int = 60                        # Tick数据过滤的时间窗口，默认60秒
-        self.filter_delta: timedelta = None                 # Tick数据过滤的时间偏差对象
+        self.filter_delta: timedelta                        # Tick数据过滤的时间偏差对象
 
         self.database: BaseDatabase = get_database()
 
@@ -85,7 +84,7 @@ class RecorderEngine(BaseEngine):
         """"""
         while self.active:
             try:
-                task: object = self.queue.get(timeout=1)
+                task: tuple[str, list] = self.queue.get(timeout=1)
                 task_type, data = task
 
                 if task_type == "tick":
@@ -122,7 +121,7 @@ class RecorderEngine(BaseEngine):
             return
 
         if Exchange.LOCAL.value not in vt_symbol:
-            contract: Optional[ContractData] = self.main_engine.get_contract(vt_symbol)
+            contract: ContractData | None = self.main_engine.get_contract(vt_symbol)
             if not contract:
                 self.write_log(f"找不到合约：{vt_symbol}")
                 return
@@ -150,7 +149,7 @@ class RecorderEngine(BaseEngine):
 
         # For normal contract
         if Exchange.LOCAL.value not in vt_symbol:
-            contract: Optional[ContractData] = self.main_engine.get_contract(vt_symbol)
+            contract: ContractData | None = self.main_engine.get_contract(vt_symbol)
             if not contract:
                 self.write_log(f"找不到合约：{vt_symbol}")
                 return
@@ -304,7 +303,7 @@ class RecorderEngine(BaseEngine):
 
     def get_bar_generator(self, vt_symbol: str) -> BarGenerator:
         """"""
-        bg: Optional[BarGenerator] = self.bar_generators.get(vt_symbol, None)
+        bg: BarGenerator | None = self.bar_generators.get(vt_symbol, None)
 
         if not bg:
             bg = BarGenerator(self.record_bar)

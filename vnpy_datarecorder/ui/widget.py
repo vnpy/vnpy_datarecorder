@@ -131,7 +131,7 @@ class RecorderManager(QtWidgets.QWidget):
 
     def process_update_event(self, event: Event) -> None:
         """"""
-        data: object = event.data
+        data: dict = event.data
 
         self.bar_recording_edit.clear()
         bar_text: str = "\n".join(data["bar"])
@@ -174,6 +174,6 @@ class RecorderManager(QtWidgets.QWidget):
         vt_symbol: str = self.symbol_line.text()
         self.recorder_engine.remove_tick_recording(vt_symbol)
 
-    def set_interval(self, interval) -> None:
+    def set_interval(self, interval: int) -> None:
         """"""
         self.recorder_engine.timer_interval = interval
