@@ -24,7 +24,6 @@ APP_NAME = "DataRecorder"
 
 EVENT_RECORDER_LOG = "eRecorderLog"
 EVENT_RECORDER_UPDATE = "eRecorderUpdate"
-EVENT_RECORDER_EXCEPTION = "eRecorderException"
 
 
 class RecorderEngine(BaseEngine):
@@ -98,9 +97,8 @@ class RecorderEngine(BaseEngine):
             except Exception:
                 self.active = False
 
-                info = traceback.format_exc()
-                event: Event = Event(EVENT_RECORDER_EXCEPTION, info)
-                self.event_engine.put(event)
+                info: str = traceback.format_exc()
+                self.write_log(f"触发异常，录制已停止：\n{info}")
 
     def close(self) -> None:
         """"""

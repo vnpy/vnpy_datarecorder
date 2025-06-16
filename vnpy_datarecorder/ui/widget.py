@@ -10,7 +10,6 @@ from ..engine import (
     APP_NAME,
     EVENT_RECORDER_LOG,
     EVENT_RECORDER_UPDATE,
-    EVENT_RECORDER_EXCEPTION,
     RecorderEngine
 )
 
@@ -21,7 +20,6 @@ class RecorderManager(QtWidgets.QWidget):
     signal_log: QtCore.Signal = QtCore.Signal(Event)
     signal_update: QtCore.Signal = QtCore.Signal(Event)
     signal_contract: QtCore.Signal = QtCore.Signal(Event)
-    signal_exception: QtCore.Signal = QtCore.Signal(Event)
 
     def __init__(self, main_engine: MainEngine, event_engine: EventEngine) -> None:
         super().__init__()
@@ -114,14 +112,10 @@ class RecorderManager(QtWidgets.QWidget):
         self.signal_log.connect(self.process_log_event)
         self.signal_contract.connect(self.process_contract_event)
         self.signal_update.connect(self.process_update_event)
-        self.signal_exception.connect(self.process_exception_event)
 
         self.event_engine.register(EVENT_CONTRACT, self.signal_contract.emit)
-        self.event_engine.register(
-            EVENT_RECORDER_LOG, self.signal_log.emit)
-        self.event_engine.register(
-            EVENT_RECORDER_UPDATE, self.signal_update.emit)
-        self.event_engine.register(EVENT_RECORDER_EXCEPTION, self.signal_exception.emit)
+        self.event_engine.register(EVENT_RECORDER_LOG, self.signal_log.emit)
+        self.event_engine.register(EVENT_RECORDER_UPDATE, self.signal_update.emit)
 
     def process_log_event(self, event: Event) -> None:
         """"""
@@ -148,11 +142,6 @@ class RecorderManager(QtWidgets.QWidget):
 
         model: QtCore.QAbstractItemModel = self.symbol_completer.model()
         model.setStringList(self.vt_symbols)
-
-    def process_exception_event(self, event: Event) -> None:
-        """"""
-        exc_info = event.data
-        raise exc_info[1].with_traceback(exc_info[2])
 
     def add_bar_recording(self) -> None:
         """"""
