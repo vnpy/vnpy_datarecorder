@@ -3,7 +3,7 @@ from threading import Thread
 from queue import Queue, Empty
 from copy import copy
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 from vnpy.event import Event, EventEngine
 from vnpy.trader.engine import BaseEngine, MainEngine
@@ -15,7 +15,8 @@ from vnpy.trader.object import (
     ContractData
 )
 from vnpy.trader.event import EVENT_TICK, EVENT_CONTRACT, EVENT_TIMER
-from vnpy.trader.utility import load_json, save_json, BarGenerator
+from vnpy.trader.setting import SETTINGS
+from vnpy.trader.utility import load_json, save_json, BarGenerator, extract_vt_symbol
 from vnpy.trader.database import BaseDatabase, get_database, DB_TZ
 from vnpy_spreadtrading.base import EVENT_SPREAD_DATA, SpreadItem
 
@@ -55,9 +56,13 @@ class RecorderEngine(BaseEngine):
         self.filter_window: int = 60                        # Tick数据过滤的时间窗口，默认60秒
         self.filter_delta: timedelta                        # Tick数据过滤的时间偏差对象
 
+        self.session_defaults: dict[str, list[tuple[time, time]]] = {}
+        self.session_overrides: dict[str, list[tuple[time, time]]] = {}
+
         self.database: BaseDatabase = get_database()
 
         self.load_setting()
+        self.load_session_setting()
         self.register_event()
         self.start()
         self.put_event()
@@ -78,6 +83,59 @@ class RecorderEngine(BaseEngine):
             "bar": self.bar_recordings
         }
         save_json(self.setting_filename, setting)
+
+    def load_session_setting(self) -> None:
+        """
+        从vt_setting.json加载交易时段配置
+        """
+        defaults: dict = SETTINGS.get("datarecorder.session.defaults", {})
+        for exchange, sessions in defaults.items():
+            self.session_defaults[exchange] = self.parse_sessions(sessions)
+
+        overrides: dict = SETTINGS.get("datarecorder.session.overrides", {})
+        for key, sessions in overrides.items():
+            self.session_overrides[key] = self.parse_sessions(sessions)
+
+    def parse_sessions(self, sessions: list[str]) -> list[tuple[time, time]]:
+        """
+        解析"HH:MM-HH:MM"字符串列表为时间段
+        """
+        result: list[tuple[time, time]] = []
+        for item in sessions:
+            start_str, end_str = item.split("-")
+            start: time = datetime.strptime(start_str, "%H:%M").time()
+            end: time = datetime.strptime(end_str, "%H:%M").time()
+            result.append((start, end))
+        return result
+
+    def is_in_trading_time(self, vt_symbol: str, dt: datetime) -> bool:
+        """
+        判断时间是否处于交易时段内
+
+        匹配优先级：合约级覆盖 > 品种级覆盖 > 交易所默认 > 放行
+        """
+        sessions: list[tuple[time, time]] | None = self.session_overrides.get(vt_symbol)
+
+        if sessions is None:
+            symbol, exchange = extract_vt_symbol(vt_symbol)
+            variety: str = "".join(ch for ch in symbol if ch.isalpha())
+            sessions = self.session_overrides.get(f"{variety}.{exchange.value}")
+
+        if sessions is None:
+            _, exchange = extract_vt_symbol(vt_symbol)
+            sessions = self.session_defaults.get(exchange.value)
+
+        if not sessions:
+            return True
+
+        t: time = dt.time()
+        for start, end in sessions:
+            if start <= end:
+                if start <= t < end:
+                    return True
+            elif t >= start or t < end:
+                return True
+        return False
 
     def run(self) -> None:
         """"""
@@ -204,6 +262,10 @@ class RecorderEngine(BaseEngine):
         # 过滤偏离本地时间戳过大的Tick数据
         tick_delta: timedelta = abs(tick.datetime - self.filter_dt)
         if abs(tick_delta) >= self.filter_delta:
+            return
+
+        # 过滤非交易时段数据
+        if not self.is_in_trading_time(tick.vt_symbol, tick.datetime):
             return
 
         if tick.vt_symbol in self.tick_recordings:
