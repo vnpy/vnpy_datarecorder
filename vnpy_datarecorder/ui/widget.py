@@ -1,5 +1,6 @@
 """行情记录管理界面。"""
 from datetime import datetime
+from typing import cast
 
 from vnpy.event import Event, EventEngine
 from vnpy.trader.engine import MainEngine
@@ -28,7 +29,7 @@ class RecorderManager(QtWidgets.QWidget):
 
         self.main_engine: MainEngine = main_engine
         self.event_engine: EventEngine = event_engine
-        self.recorder_engine: RecorderEngine = main_engine.get_engine(APP_NAME)
+        self.recorder_engine: RecorderEngine = cast(RecorderEngine, main_engine.get_engine(APP_NAME))
 
         self.init_ui()
         self.register_event()
@@ -53,7 +54,7 @@ class RecorderManager(QtWidgets.QWidget):
         self.vt_symbols: list = [contract.vt_symbol for contract in contracts]
 
         self.symbol_completer: QtWidgets.QCompleter = QtWidgets.QCompleter(self.vt_symbols)
-        self.symbol_completer.setFilterMode(QtCore.Qt.MatchContains)
+        self.symbol_completer.setFilterMode(QtCore.Qt.MatchFlag.MatchContains)
         self.symbol_completer.setCompletionMode(self.symbol_completer.CompletionMode.PopupCompletion)
         self.symbol_line.setCompleter(self.symbol_completer)
 
@@ -142,7 +143,7 @@ class RecorderManager(QtWidgets.QWidget):
         contract: ContractData = event.data
         self.vt_symbols.append(contract.vt_symbol)
 
-        model: QtCore.QAbstractItemModel = self.symbol_completer.model()
+        model: QtCore.QStringListModel = cast(QtCore.QStringListModel, self.symbol_completer.model())
         model.setStringList(self.vt_symbols)
 
     def add_bar_recording(self) -> None:
