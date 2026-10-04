@@ -21,10 +21,10 @@ from vnpy.trader.database import BaseDatabase, get_database, DB_TZ
 from vnpy_spreadtrading.base import EVENT_SPREAD_DATA, SpreadItem
 
 
-APP_NAME = "DataRecorder"
+APP_NAME: str = "DataRecorder"
 
-EVENT_RECORDER_LOG = "eRecorderLog"
-EVENT_RECORDER_UPDATE = "eRecorderUpdate"
+EVENT_RECORDER_LOG: str = "eRecorderLog"
+EVENT_RECORDER_UPDATE: str = "eRecorderUpdate"
 
 
 class RecorderEngine(BaseEngine):
@@ -85,6 +85,8 @@ class RecorderEngine(BaseEngine):
         while self.active:
             try:
                 task: tuple[str, list] = self.queue.get(timeout=1)
+                task_type: str
+                data: list
                 task_type, data = task
 
                 if task_type == "tick":
@@ -223,10 +225,12 @@ class RecorderEngine(BaseEngine):
             return
         self.timer_count = 0
 
+        bars: list[BarData]
         for bars in self.bars.values():
             self.queue.put(("bar", bars))
         self.bars.clear()
 
+        ticks: list[TickData]
         for ticks in self.ticks.values():
             self.queue.put(("tick", ticks))
         self.ticks.clear()
